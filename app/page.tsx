@@ -139,7 +139,7 @@ export default function Home() {
       <>
       <Image priority src={currentImage as string} 
       alt="gif-responses" className="w-2/5 h-2/5 object-contain" 
-      
+      loading={<LoadingSpinner className="w-100 h-100"/>}
       />
       <h1 className="question text-7xl">{h1text}</h1>
       <div className="space-x-16">
