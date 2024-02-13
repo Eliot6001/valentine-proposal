@@ -14,6 +14,7 @@ import win from './gifs/win.gif';
 import yes from './gifs/yes.gif';
 import yesResponse from './gifs/yesResponse.gif';
 import { StaticImport } from 'next/dist/shared/lib/get-img-props';
+import { LoadingSpinner } from './loadingSpinner';
 
 type AllowedImages = StaticImageData;
 type StaticImageData = {
@@ -28,7 +29,8 @@ export default function Home() {
   const [noclicks, setNoclicks] = useState(0);
   const [angry, setAngry] = useState<boolean>(false);
   const [h1text, setH1text] = useState<string>('Will you be my valentine?');
-
+  const [preloading, setPreloading] = useState<AllowedImages>(wait);
+  const [loading, setLoading] = useState(true);
   const [currentImage, setCurrentImage] = useState<AllowedImages>(wait);
   const mainRef = useRef(null);
   const images = {
@@ -54,6 +56,12 @@ export default function Home() {
 
     }
   }
+  useEffect(() => {
+      Object.values(images).forEach(image => {
+        setPreloading(image);
+      });
+      setLoading(false);
+  }, [])
   useEffect(() => {
     switch (currentImage) {
       case no1:
@@ -127,7 +135,12 @@ export default function Home() {
     <div className={`h-lvh w-full flex flex-col justify-center items-center m-auto space-y-6 ${angry ? 'bg-red-500 transition-all duration-150' : 'bg-white'}`} 
     onClick={handleOnClick} ref={mainRef}>
 
-      <Image priority src={currentImage as string} alt="gif-responses" className="w-2/5 h-2/5 object-contain" />
+      {!loading && 
+      <>
+      <Image priority src={currentImage as string} 
+      alt="gif-responses" className="w-2/5 h-2/5 object-contain" 
+      
+      />
       <h1 className="question text-7xl">{h1text}</h1>
       <div className="space-x-16">
         <Button className="w-32 h-12 text-2xl z-10" onClick={yesButtonCounter}> Yes </Button>
@@ -135,6 +148,11 @@ export default function Home() {
 
         > No </Button>
       </div>
+      </>
+      }
+      {loading &&<><LoadingSpinner className="w-100 h-100"/>
+      <Image priority src={preloading as StaticImport} alt="preloading" width={0} height={0} className="hidden"/> </> }
+     
     </div>
   );
 }
