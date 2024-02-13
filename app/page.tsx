@@ -18,7 +18,7 @@ import { StaticImport } from 'next/dist/shared/lib/get-img-props';
 type AllowedImages = StaticImageData;
 type StaticImageData = {
   src: string;
-};
+} | string;
 //Mostly done as a joke so i didn't mind having some "conventions breaking" code
 //I don't own any of the gifs used.
 
@@ -127,7 +127,7 @@ export default function Home() {
     <div className={`h-lvh w-full flex flex-col justify-center items-center m-auto space-y-6 ${angry ? 'bg-red-500 transition-all duration-150' : 'bg-white'}`} 
     onClick={handleOnClick} ref={mainRef}>
 
-      <Image src={currentImage as StaticImport} alt="gif-responses" className="w-2/5 h-2/5 object-contain" />
+      <Image priority src={currentImage as string} alt="gif-responses" className="w-2/5 h-2/5 object-contain" />
       <h1 className="question text-7xl">{h1text}</h1>
       <div className="space-x-16">
         <Button className="w-32 h-12 text-2xl z-10" onClick={yesButtonCounter}> Yes </Button>
