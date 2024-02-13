@@ -1,113 +1,140 @@
+"use client"
+import { useEffect, useState, useRef } from 'react'
+import { Button } from "@/components/ui/button";
 import Image from "next/image";
+import no1 from './gifs/No-1.gif';
+import no2 from './gifs/No-2.gif';
+import no3 from './gifs/No-3.gif';
+import no4 from './gifs/No-4.gif';
+import no5 from './gifs/No-5.gif';
+import fail from './gifs/fail.gif';
+import randomClick from './gifs/randomClick.gif';
+import wait from './gifs/wait.gif';
+import win from './gifs/win.gif';
+import yes from './gifs/yes.gif';
+import yesResponse from './gifs/yesResponse.gif';
+import { StaticImport } from 'next/dist/shared/lib/get-img-props';
+
+type AllowedImages = StaticImageData;
+type StaticImageData = {
+  src: string;
+};
+//Mostly done as a joke so i didn't mind having some "conventions breaking" code
+//I don't own any of the gifs used.
 
 export default function Home() {
+  const [clicked, setClicked] = useState(false);
+  const [yesclicks, setYesclicks] = useState(0);
+  const [noclicks, setNoclicks] = useState(0);
+  const [angry, setAngry] = useState<boolean>(false);
+  const [h1text, setH1text] = useState<string>('Will you be my valentine?');
+
+  const [currentImage, setCurrentImage] = useState<AllowedImages>(wait);
+  const mainRef = useRef(null);
+  const images = {
+    'no1': no1,
+    'no2': no2,
+    'no3': no3,
+    'no4': no4,
+    'no5': no5,
+    'fail': fail,
+    'randomClick': randomClick,
+    'wait': wait,
+    'win': win,
+    'yes': yes,
+    'yesResponse': yesResponse,
+  };
+  type ImageMap = {
+    [key: string]: StaticImageData;
+  };
+  const handleOnClick = (e: React.MouseEvent<HTMLDivElement, MouseEvent>) => {
+    if (e.target === mainRef.current) {
+      setCurrentImage(images['randomClick'])
+      setClicked(!clicked);
+
+    }
+  }
+  useEffect(() => {
+    switch (currentImage) {
+      case no1:
+        setH1text("fine, i don't care anyway, u sure..?")
+        break;
+      case no2:
+        setH1text("i don't care, u sure tho...?");
+        break;
+      case no3:
+        setH1text("please, u sure?")
+        break;
+      case no4:
+        setH1text("W-would u consider?")
+        break;
+      case no5:
+        setH1text("fine... ")
+        break;
+      case randomClick:
+        setH1text("better reply~")
+        setAngry(true);
+        break;
+      case win:
+        setH1text("Y-yay")
+        break;
+      case yes:
+        setH1text("Y-you sure?")
+        break;
+      case yesResponse:
+        setH1text("im in luv~ ")
+        break;
+      default: //gonna be wait
+        setH1text("Will you be my valentine?");
+        setCurrentImage(wait);
+        break;
+    }
+
+  }, [clicked])
+  const noButtonCounter = () => {
+    const noImages = ['no1', 'no2', 'no3', 'no4', 'no5'];
+    setAngry(false);
+    setYesclicks(0);
+    if (noclicks < 4) {
+      setNoclicks(noclicks => noclicks + 1);
+    }
+    else { setNoclicks(0); }
+    //@ts-ignore
+    setCurrentImage(images[noImages[noclicks]]);
+    console.log(noclicks, "noclicks");
+    setClicked(!clicked)
+  }
+  const yesButtonCounter = () => {
+    const yesImages = ['yes', 'yesResponse', 'win']
+    setAngry(false);
+    setNoclicks(0)
+    if (yesclicks < 3) {
+      setYesclicks(yesclicks => yesclicks + 1);
+    }
+    else {
+      setYesclicks(0)
+    }
+
+    console.log(yesclicks, "yesclicks");
+//@ts-ignore
+    setCurrentImage(images[yesImages[yesclicks]]);
+    setClicked(!clicked);
+
+  }
+
+
   return (
-    <main className="flex min-h-screen flex-col items-center justify-between p-24">
-      <div className="z-10 max-w-5xl w-full items-center justify-between font-mono text-sm lg:flex">
-        <p className="fixed left-0 top-0 flex w-full justify-center border-b border-gray-300 bg-gradient-to-b from-zinc-200 pb-6 pt-8 backdrop-blur-2xl dark:border-neutral-800 dark:bg-zinc-800/30 dark:from-inherit lg:static lg:w-auto  lg:rounded-xl lg:border lg:bg-gray-200 lg:p-4 lg:dark:bg-zinc-800/30">
-          Get started by editing&nbsp;
-          <code className="font-mono font-bold">app/page.tsx</code>
-        </p>
-        <div className="fixed bottom-0 left-0 flex h-48 w-full items-end justify-center bg-gradient-to-t from-white via-white dark:from-black dark:via-black lg:static lg:h-auto lg:w-auto lg:bg-none">
-          <a
-            className="pointer-events-none flex place-items-center gap-2 p-8 lg:pointer-events-auto lg:p-0"
-            href="https://vercel.com?utm_source=create-next-app&utm_medium=appdir-template&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            By{" "}
-            <Image
-              src="/vercel.svg"
-              alt="Vercel Logo"
-              className="dark:invert"
-              width={100}
-              height={24}
-              priority
-            />
-          </a>
-        </div>
+    <div className={`h-lvh w-full flex flex-col justify-center items-center m-auto space-y-6 ${angry ? 'bg-red-500 transition-all duration-150' : 'bg-white'}`} 
+    onClick={handleOnClick} ref={mainRef}>
+
+      <Image src={currentImage as StaticImport} alt="gif-responses" className="w-2/5 h-2/5 object-contain" />
+      <h1 className="question text-7xl">{h1text}</h1>
+      <div className="space-x-16">
+        <Button className="w-32 h-12 text-2xl z-10" onClick={yesButtonCounter}> Yes </Button>
+        <Button className={"w-32 h-12 text-2xl z-10"} onClick={noButtonCounter}
+
+        > No </Button>
       </div>
-
-      <div className="relative flex place-items-center before:absolute before:h-[300px] before:w-full sm:before:w-[480px] before:-translate-x-1/2 before:rounded-full before:bg-gradient-radial before:from-white before:to-transparent before:blur-2xl before:content-[''] after:absolute after:-z-20 after:h-[180px] after:w-full sm:after:w-[240px] after:translate-x-1/3 after:bg-gradient-conic after:from-sky-200 after:via-blue-200 after:blur-2xl after:content-[''] before:dark:bg-gradient-to-br before:dark:from-transparent before:dark:to-blue-700 before:dark:opacity-10 after:dark:from-sky-900 after:dark:via-[#0141ff] after:dark:opacity-40 before:lg:h-[360px] z-[-1]">
-        <Image
-          className="relative dark:drop-shadow-[0_0_0.3rem_#ffffff70] dark:invert"
-          src="/next.svg"
-          alt="Next.js Logo"
-          width={180}
-          height={37}
-          priority
-        />
-      </div>
-
-      <div className="mb-32 grid text-center lg:max-w-5xl lg:w-full lg:mb-0 lg:grid-cols-4 lg:text-left">
-        <a
-          href="https://nextjs.org/docs?utm_source=create-next-app&utm_medium=appdir-template&utm_campaign=create-next-app"
-          className="group rounded-lg border border-transparent px-5 py-4 transition-colors hover:border-gray-300 hover:bg-gray-100 hover:dark:border-neutral-700 hover:dark:bg-neutral-800/30"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <h2 className={`mb-3 text-2xl font-semibold`}>
-            Docs{" "}
-            <span className="inline-block transition-transform group-hover:translate-x-1 motion-reduce:transform-none">
-              -&gt;
-            </span>
-          </h2>
-          <p className={`m-0 max-w-[30ch] text-sm opacity-50`}>
-            Find in-depth information about Next.js features and API.
-          </p>
-        </a>
-
-        <a
-          href="https://nextjs.org/learn?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-          className="group rounded-lg border border-transparent px-5 py-4 transition-colors hover:border-gray-300 hover:bg-gray-100 hover:dark:border-neutral-700 hover:dark:bg-neutral-800/30"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <h2 className={`mb-3 text-2xl font-semibold`}>
-            Learn{" "}
-            <span className="inline-block transition-transform group-hover:translate-x-1 motion-reduce:transform-none">
-              -&gt;
-            </span>
-          </h2>
-          <p className={`m-0 max-w-[30ch] text-sm opacity-50`}>
-            Learn about Next.js in an interactive course with&nbsp;quizzes!
-          </p>
-        </a>
-
-        <a
-          href="https://vercel.com/templates?framework=next.js&utm_source=create-next-app&utm_medium=appdir-template&utm_campaign=create-next-app"
-          className="group rounded-lg border border-transparent px-5 py-4 transition-colors hover:border-gray-300 hover:bg-gray-100 hover:dark:border-neutral-700 hover:dark:bg-neutral-800/30"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <h2 className={`mb-3 text-2xl font-semibold`}>
-            Templates{" "}
-            <span className="inline-block transition-transform group-hover:translate-x-1 motion-reduce:transform-none">
-              -&gt;
-            </span>
-          </h2>
-          <p className={`m-0 max-w-[30ch] text-sm opacity-50`}>
-            Explore starter templates for Next.js.
-          </p>
-        </a>
-
-        <a
-          href="https://vercel.com/new?utm_source=create-next-app&utm_medium=appdir-template&utm_campaign=create-next-app"
-          className="group rounded-lg border border-transparent px-5 py-4 transition-colors hover:border-gray-300 hover:bg-gray-100 hover:dark:border-neutral-700 hover:dark:bg-neutral-800/30"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <h2 className={`mb-3 text-2xl font-semibold`}>
-            Deploy{" "}
-            <span className="inline-block transition-transform group-hover:translate-x-1 motion-reduce:transform-none">
-              -&gt;
-            </span>
-          </h2>
-          <p className={`m-0 max-w-[30ch] text-sm opacity-50 text-balance`}>
-            Instantly deploy your Next.js site to a shareable URL with Vercel.
-          </p>
-        </a>
-      </div>
-    </main>
+    </div>
   );
 }
